@@ -8,9 +8,13 @@ export const app = express();
 
 app.use(helmet());
 
+
+
 // cors expects origin to be boolean | string | RegExp | (string | RegExp)[]
 // So we check if env.CORS_ORIGIN exists, else fallback to true (allow all)
-const corsOrigin = env.CORS_ORIGIN ?? true;
+
+
+const corsOrigin = env.CORS_ORIGIN?.split(',') ?? true;
 
 app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json());
