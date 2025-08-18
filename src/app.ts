@@ -10,8 +10,6 @@ app.use(helmet());
 
 
 
-// cors expects origin to be boolean | string | RegExp | (string | RegExp)[]
-// So we check if env.CORS_ORIGIN exists, else fallback to true (allow all)
 
 const allowedOrigins = ['http://localhost:5173', 'https://speaktribe-frontend.vercel.app'];
 

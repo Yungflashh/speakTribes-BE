@@ -10,8 +10,6 @@ const cors_1 = __importDefault(require("cors"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 exports.app = (0, express_1.default)();
 exports.app.use((0, helmet_1.default)());
-// cors expects origin to be boolean | string | RegExp | (string | RegExp)[]
-// So we check if env.CORS_ORIGIN exists, else fallback to true (allow all)
 const allowedOrigins = ['http://localhost:5173', 'https://speaktribe-frontend.vercel.app'];
 const corsOptions = {
     origin: (origin, callback) => {
