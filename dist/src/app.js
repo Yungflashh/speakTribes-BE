@@ -7,14 +7,24 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
 const cors_1 = __importDefault(require("cors"));
-const env_1 = require("./config/env");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 exports.app = (0, express_1.default)();
 exports.app.use((0, helmet_1.default)());
 // cors expects origin to be boolean | string | RegExp | (string | RegExp)[]
 // So we check if env.CORS_ORIGIN exists, else fallback to true (allow all)
-const corsOrigin = env_1.env.CORS_ORIGIN?.split(',') ?? true;
-exports.app.use((0, cors_1.default)({ origin: corsOrigin, credentials: true }));
+const allowedOrigins = ['http://localhost:5173', 'https://speaktribe-frontend.vercel.app'];
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+};
+exports.app.use((0, cors_1.default)(corsOptions));
 exports.app.use(express_1.default.json());
 exports.app.get('/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 exports.app.get("/", (req, res) => {
