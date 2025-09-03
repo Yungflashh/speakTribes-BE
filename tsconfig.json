@@ -9,7 +9,9 @@
     "skipLibCheck": true,
     "strict": true,
     "resolveJsonModule": true,
-    "baseUrl": "./src"
+    "baseUrl": "./src",
+    "typeRoots": ["./src/types", "./node_modules/@types"]
+
   },
   "include": ["src", "prisma"],
   "exclude": ["node_modules", "dist"]

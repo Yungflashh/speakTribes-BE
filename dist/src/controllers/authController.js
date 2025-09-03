@@ -35,32 +35,59 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = register;
 exports.login = login;
+exports.sendOtp = sendOtp;
+exports.verifyOtp = verifyOtp;
 const authService = __importStar(require("../services/authService"));
-const authSchemas_1 = require("../schemas/authSchemas");
+const client_1 = require("@prisma/client");
 async function register(req, res) {
     try {
-        const parsed = authSchemas_1.registerSchema.parse(req.body);
-        const user = await authService.registerUser(parsed.email, parsed.firstName, parsed.lastName, parsed.password, parsed.displayName);
-        res.status(201).json({ user });
+        const { email, firstName, lastName, password, role, displayName } = req.body;
+        if (!email || !firstName || !lastName || !password) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+        const user = await authService.registerUser(email, firstName, lastName, password, role || client_1.Role.STUDENT, displayName);
+        res.status(201).json({ message: "User registered successfully", user });
     }
     catch (error) {
-        if (error?.issues) {
-            // zod validation errors
-            return res.status(400).json({ errors: error.issues });
-        }
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ message: error.message || "Registration failed" });
     }
 }
 async function login(req, res) {
     try {
-        const parsed = authSchemas_1.loginSchema.parse(req.body);
-        const { user, token } = await authService.login(parsed.email, parsed.password);
-        res.json({ user, token });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password required" });
+        }
+        const { user, token } = await authService.login(email, password);
+        res.status(200).json({ message: "Login successful", user, token });
     }
     catch (error) {
-        if (error?.issues) {
-            return res.status(400).json({ errors: error.issues });
+        res.status(401).json({ message: error.message || "Login failed" });
+    }
+}
+async function sendOtp(req, res) {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
         }
-        res.status(401).json({ error: error.message });
+        const result = await authService.sendOtp(email);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message || "Failed to send OTP" });
+    }
+}
+async function verifyOtp(req, res) {
+    try {
+        const { email, otp } = req.body;
+        if (!email || !otp) {
+            return res.status(400).json({ message: "Email and OTP are required" });
+        }
+        const result = await authService.verifyOtp(email, otp);
+        res.status(200).json({ message: "OTP verified", ...result });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message || "OTP verification failed" });
     }
 }

@@ -22,64 +22,18 @@ model User {
   role        Role    @default(STUDENT)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  progress    UserCourseProgress[]
 }
 
-model Course {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  slug        String   @unique
-  description String?
-  fromLang    String
-  toLang      String
-  level       String?
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  lessons     Lesson[]
 
 
-   userCourseProgress  UserCourseProgress[] 
-}
-
-model Lesson {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  courseId    String   @db.ObjectId
-  course      Course   @relation(fields: [courseId], references: [id])
-  index       Int
-  title       String
-  content     Json?
-  durationSec Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([courseId, index])
-}
-
-model UserCourseProgress {
+model OtpRequest {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String   @db.ObjectId
-  courseId         String   @db.ObjectId
-  lastLessonId     String?  @db.ObjectId
-  lastPositionSec  Int      @default(0)
-  completedLessons String[] @db.ObjectId
-  xp               Int      @default(0)
-  streak           Int      @default(0)
-  updatedAt        DateTime @updatedAt
-  createdAt        DateTime @default(now())
-
-  user     User    @relation(fields: [userId], references: [id])
-  course   Course  @relation(fields: [courseId], references: [id])
-
-  @@unique([userId, courseId])
-}
-
-model ActivityLog {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  type      String
-  meta      Json?
+  email     String
+  otp       String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([email])
 }
+
